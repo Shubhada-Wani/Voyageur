@@ -33,7 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['voyageur-production.up.railway.app']
 
-CSRF_TRUSTED_ORIGINS = ["voyageur-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://voyageur-production.up.railway.app"]
 
 
 # Application definition
