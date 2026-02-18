@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Travel Journal — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.8rem;
+  }
+  .blog-card { display: flex; flex-direction: column; }
+  .blog-card .card__body { flex: 1; }
+  .blog-card .card__img { height: 220px; }
+
+  @media (max-width: 1024px) { .blog-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px)  { .blog-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-hero">
+  <div class="page-hero__content">
+    <div class="section-label" style="margin-bottom:0.6rem;">Stories &amp; Guides</div>
+    <h1 class="page-hero__title">Travel Journal</h1>
+    <p class="page-hero__breadcrumb">
+      <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp; Journal
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="blog-grid">
+      {% for blog in blogs %}
+      <a href="{% url 'blog_detail' blog.slug %}" class="card blog-card" style="display:flex; flex-direction:column; text-decoration:none;">
+        <div class="card__img-wrap">
+          {% if blog.image %}
+            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="card__img" />
+          {% else %}
+            <div style="height:220px; background:linear-gradient(135deg, var(--surface), rgba(201,169,110,0.08)); display:flex; align-items:center; justify-content:center;">
+              <i class="fas fa-feather-pointed" style="font-size:2rem; color:var(--gold); opacity:0.3;"></i>
+            </div>
+          {% endif %}
+          {% if blog.featured %}
+          <div style="position:absolute; top:1rem; left:1rem;">
+            <span class="badge badge-gold"><i class="fas fa-star"></i> Featured</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card__body" style="flex:1;">
+          <div class="card__label">{{ blog.published_at|date:"F d, Y" }}</div>
+          <div class="card__title">{{ blog.title }}</div>
+          <p class="card__text">{{ blog.content|truncatechars:110 }}</p>
+        </div>
+        <div class="card__footer">
+          <span style="font-size:0.78rem; color:var(--text-muted);">Read Article</span>
+          <i class="fas fa-arrow-right" style="color:var(--gold); font-size:0.8rem;"></i>
+        </div>
+      </a>
+      {% empty %}
+        <p style="color:var(--text-muted); grid-column:1/-1; text-align:center; padding:4rem 0; font-family:'Cormorant Garamond',serif; font-size:1.4rem;">No articles published yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

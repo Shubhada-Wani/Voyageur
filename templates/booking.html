@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ hotel.name }} — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .booking-layout {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .booking-hotel-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: sticky;
+    top: 96px;
+  }
+  .booking-hotel-preview__img {
+    width: 100%; height: 200px;
+    object-fit: cover;
+  }
+  .booking-hotel-preview__body { padding: 1.4rem; }
+  .booking-hotel-preview__name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+  }
+  .booking-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+  @media (max-width: 768px) {
+    .booking-layout { grid-template-columns: 1fr; }
+    .booking-hotel-preview { position: static; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="page-hero__content">
+    <div class="section-label" style="margin-bottom:0.6rem;">Reservation</div>
+    <h1 class="page-hero__title">Complete Booking</h1>
+    <p class="page-hero__breadcrumb">
+      <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp;
+      <a href="{% url 'hotel_detail' hotel.slug %}">{{ hotel.name }}</a> &nbsp;/&nbsp; Book
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="booking-layout">
+      <!-- FORM -->
+      <div class="booking-form-card">
+        <h2 style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; margin-bottom:0.5rem; color:var(--text-main);">Your Details</h2>
+        <p style="color:var(--text-muted); font-size:0.84rem; margin-bottom:2rem;">Fill in your stay details below. Payment is collected at the hotel.</p>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Check In Date</label>
+            <input type="date" name="check_in" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Check Out Date</label>
+            <input type="date" name="check_out" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Number of Guests</label>
+            <input type="number" name="guests" min="1" max="20" placeholder="1" class="form-input" required />
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="background:rgba(201,169,110,0.06); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; margin-bottom:1.6rem;">
+            <div style="display:flex; align-items:center; gap:0.8rem;">
+              <i class="fas fa-shield-halved" style="color:var(--gold);"></i>
+              <div>
+                <div style="font-size:0.82rem; color:var(--text-main); font-weight:500;">Pay at Hotel</div>
+                <div style="font-size:0.76rem; color:var(--text-muted);">No payment required now. Settle directly at the property.</div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:1rem; font-size:0.82rem;">
+            <i class="fas fa-calendar-check"></i> Confirm Reservation
+          </button>
+        </form>
+      </div>
+
+      <!-- HOTEL PREVIEW -->
+      <div class="booking-hotel-preview">
+        {% if hotel.image %}
+          <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="booking-hotel-preview__img" />
+        {% else %}
+          <div style="height:200px; background:linear-gradient(135deg,var(--surface),rgba(201,169,110,0.08)); display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-hotel" style="font-size:2rem; color:var(--gold); opacity:0.3;"></i>
+          </div>
+        {% endif %}
+        <div class="booking-hotel-preview__body">
+          <div class="card__label">{{ hotel.destination.name }}</div>
+          <div class="booking-hotel-preview__name">{{ hotel.name }}</div>
+          <div class="divider" style="margin:0.8rem 0;"></div>
+          <div style="display:flex; justify-content:space-between; font-size:0.84rem; color:var(--text-muted);">
+            <span>Price per night</span>
+            <span style="color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:1.1rem;">${{ hotel.price_per_night }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

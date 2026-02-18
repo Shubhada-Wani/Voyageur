@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+  {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block extra_head %}
+<style>
+  .auth-page {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 25% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 75% 40%, rgba(201,169,110,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .auth-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.8rem;
+    width: 100%;
+    max-width: 440px;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .auth-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .auth-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 0.4rem;
+  }
+  .auth-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  /* Provider icon badge */
+  .provider-badge {
+    width: 64px; height: 64px;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.4rem;
+  }
+  .provider-badge i {
+    font-size: 1.6rem;
+    color: var(--gold);
+  }
+
+  /* Info notice box */
+  .auth-notice {
+    background: rgba(201,169,110,0.06);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.8rem;
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+  .auth-notice i {
+    color: var(--gold);
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+  .auth-notice p {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .auth-notice p strong {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* Divider */
+  .auth-divider {
+    width: 100%; height: 1px;
+    background: var(--border);
+    margin: 1.6rem 0;
+  }
+
+  .auth-footer {
+    margin-top: 1.4rem;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .auth-footer a { color: var(--gold); }
+  .auth-footer a:hover { text-decoration: underline; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Provider Icon -->
+    <div class="provider-badge">
+      {% if process == "connect" %}
+        <i class="fas fa-link"></i>
+      {% else %}
+        <i class="fab fa-google"></i>
+      {% endif %}
+    </div>
+
+    <div class="auth-logo">Voyageur</div>
+
+    <!-- Title -->
+    {% if process == "connect" %}
+      <h1 class="auth-title">
+        {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
+      </h1>
+    {% else %}
+      <h1 class="auth-title">
+        {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
+      </h1>
+    {% endif %}
+
+    <!-- Subtitle notice -->
+    <div class="auth-notice">
+      <i class="fas fa-circle-info"></i>
+      <p>
+        {% if process == "connect" %}
+          {% blocktrans with provider.name as provider %}
+            You are about to connect a new third-party account from <strong>{{ provider }}</strong>.
+          {% endblocktrans %}
+        {% else %}
+          {% blocktrans with provider.name as provider %}
+            You are about to sign in using a third-party account from <strong>{{ provider }}</strong>.
+          {% endblocktrans %}
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- Form -->
+    {% element form method="post" no_visible_fields=True %}
+      {% slot actions %}
+        {% csrf_token %}
+        <div class="auth-divider"></div>
+        {% element button type="submit" %}
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.9rem; font-size:0.82rem;">
+            {% if process == "connect" %}
+              <i class="fas fa-link"></i> Connect Account
+            {% else %}
+              <i class="fas fa-arrow-right-to-bracket"></i> Continue
+            {% endif %}
+          </button>
+        {% endelement %}
+      {% endslot %}
+    {% endelement %}
+
+    <div class="auth-footer">
+      Changed your mind?
+      <a href="{% url 'home' %}">Go back home</a>
+    </div>
+
+  </div>
+</div>
+{% endblock content %}

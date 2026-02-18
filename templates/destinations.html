@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Destinations{% endblock %}
+
+{% block content %}
+<h1>All Destinations</h1>
+
+<div class="destinations-list">
+    {% for dest in destinations %}
+    <div class="dest-card">
+        <h3>{{ dest.name }}</h3>
+        <p>{{ dest.description|truncatewords:20 }}</p>
+        <a href="{% url 'search_hotels' %}?city={{ dest.slug }}">View Hotels</a>
+    </div>
+    {% empty %}
+    <p>No destinations available.</p>
+    {% endfor %}
+</div>
+{% endblock %}

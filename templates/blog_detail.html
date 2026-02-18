@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}{{ blog.title }} — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .blog-detail-hero {
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-detail-hero__img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.45);
+  }
+  .blog-detail-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,13,13,0.95) 0%, rgba(13,13,13,0.2) 60%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 3rem 4rem;
+  }
+  .blog-content-layout {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .blog-body {
+    font-size: 1rem;
+    line-height: 2;
+    color: var(--text-muted);
+    white-space: pre-line;
+  }
+  .blog-body p { margin-bottom: 1.4rem; }
+
+  @media (max-width: 768px) {
+    .blog-detail-hero { height: 320px; }
+    .blog-detail-hero__overlay { padding: 2rem 1.5rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="blog-detail-hero">
+  {% if blog.image %}
+    <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="blog-detail-hero__img" />
+  {% else %}
+    <div style="width:100%; height:100%; background:linear-gradient(135deg,var(--surface),rgba(201,169,110,0.1)); display:flex; align-items:center; justify-content:center;">
+      <i class="fas fa-feather-pointed" style="font-size:4rem; color:var(--gold); opacity:0.2;"></i>
+    </div>
+  {% endif %}
+  <div class="blog-detail-hero__overlay">
+    <div style="max-width:760px;">
+      <div class="section-label" style="margin-bottom:0.8rem;">{{ blog.published_at|date:"F d, Y" }}</div>
+      <h1 style="font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:#fff; line-height:1.1;">
+        {{ blog.title }}
+      </h1>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="section-sm" style="padding-bottom:0; border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <p style="font-size:0.78rem; color:var(--text-muted);">
+      <a href="{% url 'home' %}" style="color:var(--gold);">Home</a> &nbsp;/&nbsp;
+      <a href="{% url 'blog_list' %}" style="color:var(--gold);">Journal</a> &nbsp;/&nbsp;
+      {{ blog.title|truncatechars:40 }}
+    </p>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<section class="section">
+  <div class="container">
+    <div class="blog-content-layout">
+      <div class="divider-gold"></div>
+      <div class="blog-body">{{ blog.content }}</div>
+      <div class="divider"></div>
+      <a href="{% url 'blog_list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Back to Journal
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

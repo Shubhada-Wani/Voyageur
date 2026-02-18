@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Reviews for {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<h1>Reviews for {{ hotel.name }}</h1>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h2>Submit a Review</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label>Rating (1-5):</label>
+    <input type="number" name="rating" min="1" max="5" required>
+
+    <label>Comment:</label>
+    <textarea name="comment" rows="4" required></textarea>
+
+    <button type="submit">Submit Review</button>
+</form>
+
+<h2>All Reviews</h2>
+<ul>
+    {% for review in reviews %}
+    <li>
+        <strong>{{ review.user.username }}</strong> 
+        ({{ review.rating }}/5) - {{ review.created_at|date:"M d, Y" }}
+        <p>{{ review.comment }}</p>
+    </li>
+    {% empty %}
+    <li>No reviews yet. Be the first to review!</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'hotel_detail' hotel.slug %}">Back to Hotel Details</a>
+{% endblock %}

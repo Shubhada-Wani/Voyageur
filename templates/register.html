@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block title %}Create Account — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-page {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 20% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 80% 40%, rgba(201,169,110,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .auth-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.8rem;
+    width: 100%;
+    max-width: 440px;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .auth-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .auth-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 0.3rem;
+  }
+  .auth-sub {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 2.2rem;
+  }
+  .auth-footer {
+    margin-top: 1.6rem;
+    text-align: center;
+    font-size: 0.84rem;
+    color: var(--text-muted);
+  }
+  .auth-footer a { color: var(--gold); }
+  .auth-footer a:hover { text-decoration: underline; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">Voyageur</div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Join us and start exploring the world.</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-input" placeholder="yourname" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-input" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-input" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rewrite Password</label>
+        <input type="password" name="password2" class="form-input" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.9rem; margin-top:0.5rem;">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+    <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.9rem; margin-top:0.5rem;">
+        <a href="{% provider_login_url 'google' %}" class="btn-google">Login with Google</a>
+      </button>
+    
+
+
+    <div class="auth-footer">
+      Already have an account? <a href="{% url 'login' %}">Sign in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}Search Results — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .search-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .filter-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.8rem;
+    position: sticky;
+    top: 96px;
+  }
+  .filter-panel__heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.6rem;
+  }
+  .results-count {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .results-count strong { color: var(--gold); }
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.4rem;
+  }
+  .result-card {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .result-card:hover {
+    border-color: rgba(201,169,110,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  }
+  .result-card__img {
+    width: 180px; height: 100%;
+    object-fit: cover;
+    min-height: 160px;
+  }
+  .result-card__img-placeholder {
+    width: 180px;
+    background: linear-gradient(135deg, var(--surface), rgba(201,169,110,0.08));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .result-card__body {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 5rem 2rem;
+  }
+  .empty-state i { font-size: 3rem; color: var(--gold); opacity: 0.3; margin-bottom: 1rem; }
+  .empty-state p { color: var(--text-muted); font-size: 1rem; }
+
+  @media (max-width: 1024px) {
+    .search-layout { grid-template-columns: 1fr; }
+    .filter-panel { position: static; }
+    .results-grid { grid-template-columns: 1fr; }
+    .result-card { grid-template-columns: 140px 1fr; }
+  }
+  @media (max-width: 640px) {
+    .result-card { grid-template-columns: 1fr; }
+    .result-card__img { width: 100%; height: 180px; }
+    .result-card__img-placeholder { width: 100%; height: 180px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-hero">
+  <div class="page-hero__content">
+    <div class="section-label" style="margin-bottom:0.6rem;">
+      {% if city %}{{ city|title }}{% else %}All Results{% endif %}
+    </div>
+    <h1 class="page-hero__title">Search Results</h1>
+    <p class="page-hero__breadcrumb">
+      <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp; Search
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="search-layout">
+
+      <!-- FILTERS -->
+      <aside class="filter-panel">
+        <div class="filter-panel__heading">Refine Search</div>
+        <form method="GET" action="{% url 'search_hotels' %}">
+          <div class="form-group">
+            <label class="form-label">Destination</label>
+            <input type="text" name="city" value="{{ city }}" placeholder="City or area" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Check In</label>
+            <input type="date" name="check_in" value="{{ check_in }}" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Check Out</label>
+            <input type="date" name="check_out" value="{{ check_out }}" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Guests</label>
+            <input type="number" name="guests" value="{{ guests }}" min="1" placeholder="1" class="form-input" />
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">
+            <i class="fas fa-search"></i> Update Search
+          </button>
+        </form>
+      </aside>
+
+      <!-- RESULTS -->
+      <div>
+        <div class="results-header">
+          <div class="results-count">
+            Showing <strong>{{ hotels|length }}</strong> propert{{ hotels|length|pluralize:"y,ies" }}
+            {% if city %}in <strong>{{ city|title }}</strong>{% endif %}
+          </div>
+        </div>
+
+        <div class="results-grid">
+          {% for hotel in hotels %}
+          <div class="result-card">
+            {% if hotel.image %}
+              <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="result-card__img" />
+            {% else %}
+              <div class="result-card__img-placeholder">
+                <i class="fas fa-hotel" style="font-size:2rem; color:var(--gold); opacity:0.25;"></i>
+              </div>
+            {% endif %}
+            <div class="result-card__body">
+              <div>
+                <div class="card__label">{{ hotel.destination.name }}</div>
+                <div class="card__title" style="font-size:1.2rem;">{{ hotel.name }}</div>
+                <p class="card__text" style="margin-top:0.4rem;">{{ hotel.description|truncatechars:80 }}</p>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.8rem; flex-wrap:wrap; gap:0.5rem;">
+                <div class="card__price" style="margin:0;">₹{{ hotel.price_per_night }}<span> / night</span></div>
+                <a href="{% url 'hotel_detail' hotel.slug %}" class="btn btn-gold" style="padding:0.4rem 1rem; font-size:0.7rem;">
+                  Details <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-state">
+            <i class="fas fa-magnifying-glass"></i>
+            <p>No hotels matched your search. Try adjusting your filters.</p>
+            <a href="{% url 'hotels' %}" class="btn btn-outline" style="margin-top:1.5rem;">Browse All Hotels</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

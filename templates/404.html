@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align:center; padding:80px;">
+    <h1>404</h1>
+    <h3>Oops! Page not found 😢</h3>
+    <p>The page you’re looking for doesn’t exist.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Go Home</a>
+</div>
+{% endblock %}

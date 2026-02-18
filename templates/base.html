@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Voyageur — Luxury Travel{% endblock %}</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ============================================
+       CSS VARIABLES — LUXURY TRAVEL PALETTE
+    ============================================ */
+    :root {
+      --gold:        #C9A96E;
+      --gold-light:  #E8D5B0;
+      --gold-dark:   #9C7B3F;
+      --deep:        #0D0D0D;
+      --dark:        #161616;
+      --surface:     #1E1C1A;
+      --border:      rgba(201,169,110,0.18);
+      --text-main:   #F0EBE3;
+      --text-muted:  #9C9488;
+      --white:       #FFFFFF;
+      --radius:      4px;
+      --radius-lg:   12px;
+      --transition:  0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ============================================
+       RESET & BASE
+    ============================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--deep);
+      color: var(--text-main);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ============================================
+       NAVBAR
+    ============================================ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4rem;
+      height: 76px;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .navbar__logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .navbar__logo span { color: var(--text-main); }
+
+    .navbar__links {
+      display: flex;
+      align-items: center;
+      gap: 2.4rem;
+      list-style: none;
+    }
+
+    .navbar__links a {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .navbar__links a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width var(--transition);
+    }
+    .navbar__links a:hover { color: var(--gold); }
+    .navbar__links a:hover::after { width: 100%; }
+
+    .navbar__auth {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: var(--radius);
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--deep);
+    }
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.06);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { color: var(--text-main); }
+
+    /* Hamburger for mobile */
+    .navbar__hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .navbar__hamburger span {
+      width: 22px; height: 1.5px;
+      background: var(--text-main);
+      transition: var(--transition);
+    }
+
+    /* ============================================
+       MESSAGES / ALERTS
+    ============================================ */
+    .messages-container {
+      position: fixed;
+      top: 90px; right: 1.5rem;
+      z-index: 998;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-width: 360px;
+    }
+
+    .alert {
+      padding: 0.9rem 1.2rem;
+      border-radius: var(--radius);
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      animation: slideInRight 0.4s ease forwards;
+      border-left: 3px solid;
+    }
+    .alert-success { background: rgba(50,180,100,0.12); border-color: #32b464; color: #6ddc9a; }
+    .alert-error   { background: rgba(220,70,70,0.12);  border-color: #dc4646; color: #f08080; }
+    .alert-info    { background: rgba(201,169,110,0.12); border-color: var(--gold); color: var(--gold-light); }
+
+    @keyframes slideInRight {
+      from { transform: translateX(30px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ============================================
+       MAIN CONTENT
+    ============================================ */
+    main {
+      padding-top: 76px;
+      min-height: calc(100vh - 76px);
+    }
+
+    /* ============================================
+       SECTION HELPERS
+    ============================================ */
+    .section {
+      padding: 6rem 4rem;
+    }
+    .section-sm { padding: 3rem 4rem; }
+
+    .container {
+      max-width: 1260px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 32px; height: 1px;
+      background: var(--gold);
+    }
+
+    .section-title {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      color: var(--text-main);
+      margin-bottom: 0.6rem;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ============================================
+       CARD BASE
+    ============================================ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .card:hover {
+      border-color: rgba(201,169,110,0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .card__img {
+      width: 100%; height: 220px;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .card:hover .card__img { transform: scale(1.03); }
+    .card__img-wrap { overflow: hidden; position: relative; }
+
+    .card__body { padding: 1.4rem; }
+    .card__label {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    .card__title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+    .card__text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+    .card__price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin: 0.8rem 0;
+    }
+    .card__price span { font-size: 0.8rem; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+
+    .card__footer {
+      padding: 1rem 1.4rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Grid layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    /* ============================================
+       STAR RATING
+    ============================================ */
+    .stars { color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; }
+
+    /* ============================================
+       BADGE
+    ============================================ */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.8rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 40px;
+    }
+    .badge-gold { background: rgba(201,169,110,0.15); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
+    .badge-dark { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+    /* ============================================
+       DIVIDER
+    ============================================ */
+    .divider {
+      width: 100%; height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+    .divider-gold {
+      width: 48px; height: 2px;
+      background: var(--gold);
+      margin: 1rem 0 1.8rem;
+    }
+
+    /* ============================================
+       FORMS (global)
+    ============================================ */
+    .form-group { margin-bottom: 1.4rem; }
+    .form-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.1rem;
+      color: var(--text-main);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      transition: border-color var(--transition);
+      outline: none;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.04);
+    }
+    .form-textarea { resize: vertical; min-height: 130px; }
+    .form-select option { background: var(--surface); }
+
+    /* ============================================
+       FOOTER
+    ============================================ */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid var(--border);
+      padding: 4rem;
+      margin-top: auto;
+    }
+    .footer__grid {
+      max-width: 1260px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+    .footer__brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .footer__desc { font-size: 0.84rem; color: var(--text-muted); max-width: 260px; line-height: 1.8; }
+    .footer__heading {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+    .footer__links a { font-size: 0.84rem; color: var(--text-muted); transition: color var(--transition); }
+    .footer__links a:hover { color: var(--gold); }
+    .footer__bottom {
+      max-width: 1260px;
+      margin: 2.5rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .footer__social { display: flex; gap: 1rem; }
+    .footer__social a {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .footer__social a:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ============================================
+       PAGE HERO (inner pages)
+    ============================================ */
+    .page-hero {
+      height: 300px;
+      display: flex;
+      align-items: flex-end;
+      padding: 3rem 4rem;
+      background: linear-gradient(135deg, rgba(201,169,110,0.08) 0%, rgba(13,13,13,0) 60%),
+                  var(--dark);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 60px,
+        rgba(201,169,110,0.015) 60px,
+        rgba(201,169,110,0.015) 61px
+      );
+    }
+    .page-hero__content { position: relative; }
+    .page-hero__title { font-size: clamp(2.4rem, 5vw, 4rem); color: var(--text-main); }
+    .page-hero__breadcrumb {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-top: 0.5rem;
+    }
+    .page-hero__breadcrumb a { color: var(--gold); }
+    .page-hero__breadcrumb a:hover { text-decoration: underline; }
+
+    /* ============================================
+       SCROLLBAR
+    ============================================ */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--deep); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 1024px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .footer__grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+    @media (max-width: 768px) {
+      .navbar { padding: 0 1.5rem; }
+      .navbar__links, .navbar__auth { display: none; }
+      .navbar__hamburger { display: flex; }
+      .section { padding: 4rem 1.5rem; }
+      .section-sm { padding: 2rem 1.5rem; }
+      .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr; }
+      .page-hero { padding: 2rem 1.5rem; }
+      footer { padding: 2.5rem 1.5rem; }
+      .footer__grid { grid-template-columns: 1fr; gap: 1.8rem; }
+      .footer__bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ======================== NAVBAR ======================== -->
+  <nav class="navbar">
+    <a href="{% url 'home' %}" class="navbar__logo">Voy<span>ageur</span></a>
+
+    <ul class="navbar__links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'hotels' %}">Hotels</a></li>
+      <li><a href="{% url 'blog_list' %}">Journal</a></li>
+      <li><a href="{% url 'contact' %}">Contact</a></li>
+    </ul>
+
+    <div class="navbar__auth">
+      {% if user.is_authenticated %}
+        <a href="{% url 'my_bookings' %}" class="btn btn-outline">
+          <i class="fas fa-calendar-check"></i> My Bookings
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-ghost">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
+        <a href="{% url 'register' %}" class="btn btn-gold">Join Us</a>
+      {% endif %}
+    </div>
+
+    <button class="navbar__hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ======================== MESSAGES ======================== -->
+  {% if messages %}
+  <div class="messages-container">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+        <i class="fas {% if message.tags == 'error' %}fa-circle-exclamation{% elif message.tags == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ======================== MAIN ======================== -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ======================== FOOTER ======================== -->
+  <footer>
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">Voyageur</div>
+        <p class="footer__desc">Curating extraordinary travel experiences for the discerning traveller. Every stay, a story.</p>
+      </div>
+      <div>
+        <div class="footer__heading">Explore</div>
+        <ul class="footer__links">
+          <li><a href="{% url 'hotels' %}">All Hotels</a></li>
+          <li><a href="{% url 'blog_list' %}">Travel Journal</a></li>
+          <li><a href="{% url 'search_hotels' %}">Search</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__heading">Account</div>
+        <ul class="footer__links">
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'my_bookings' %}">My Bookings</a></li>
+            <li><a href="{% url 'logout' %}">Sign Out</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}">Sign In</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div>
+        <div class="footer__heading">Contact</div>
+        <ul class="footer__links">
+          <li><a href="{% url 'contact' %}">Send a Message</a></li>
+          <li><a href="mailto:voyageur989@gmail.com">hello@voyageur.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Voyageur. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-x-twitter"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Auto-dismiss messages after 4s
+    setTimeout(() => {
+      document.querySelectorAll('.alert').forEach(el => {
+        el.style.transition = 'opacity 0.4s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 400);
+      });
+    }, 4000);
+  </script>
+
+</body>
+</html>

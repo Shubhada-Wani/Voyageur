@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% block title %}{{ hotel.name }} — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .detail-hero {
+    height: 520px;
+    position: relative;
+    overflow: hidden;
+  }
+  .detail-hero__img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.55);
+  }
+  .detail-hero__placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--surface), rgba(201,169,110,0.12));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,13,13,0.9) 0%, rgba(13,13,13,0.2) 50%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 3rem 4rem;
+  }
+  .detail-hero__info { max-width: 700px; }
+  .detail-hero__dest {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+  .detail-hero__name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    color: #fff;
+    font-weight: 300;
+    margin-bottom: 1rem;
+  }
+  .detail-hero__price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--gold-light);
+  }
+  .detail-hero__price span { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: rgba(255,255,255,0.6); }
+
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 3rem;
+    align-items: start;
+  }
+  .detail-content {}
+  .detail-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: var(--text-main);
+    margin-bottom: 1.2rem;
+  }
+  .description-text {
+    color: var(--text-muted);
+    line-height: 1.9;
+    font-size: 0.95rem;
+  }
+
+  /* BOOKING CARD */
+  .booking-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    position: sticky;
+    top: 96px;
+  }
+  .booking-card__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+  }
+  .booking-card__price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 1.6rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .booking-card__price span { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text-muted); }
+
+  /* REVIEWS */
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .review-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+  }
+  .review-author { font-weight: 500; font-size: 0.88rem; color: var(--text-main); }
+  .review-date   { font-size: 0.75rem; color: var(--text-muted); }
+  .review-text   { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; }
+
+  /* ADD REVIEW */
+  .review-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.8rem;
+    margin-top: 1.6rem;
+  }
+  .star-select { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+  .star-select input[type="radio"] { display: none; }
+  .star-select label {
+    font-size: 1.4rem;
+    color: var(--border);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .star-select input:checked ~ label,
+  .star-select label:hover,
+  .star-select label:hover ~ label { color: var(--gold); }
+
+  @media (max-width: 1024px) {
+    .detail-layout { grid-template-columns: 1fr; }
+    .booking-card { position: static; }
+    .detail-hero__overlay { padding: 2rem 1.5rem; }
+  }
+  @media (max-width: 640px) { .detail-hero { height: 360px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="detail-hero">
+  {% if hotel.image %}
+    <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="detail-hero__img" />
+  {% else %}
+    <div class="detail-hero__placeholder">
+      <i class="fas fa-hotel" style="font-size:4rem; color:var(--gold); opacity:0.2;"></i>
+    </div>
+  {% endif %}
+  <div class="detail-hero__overlay">
+    <div class="detail-hero__info">
+      <div class="detail-hero__dest">
+        <i class="fas fa-location-dot"></i> {{ hotel.destination.name }}
+      </div>
+      <h1 class="detail-hero__name">{{ hotel.name }}</h1>
+      <div class="detail-hero__price">
+        ₹{{ hotel.price_per_night }}
+        <span>per night</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="section-sm" style="padding-bottom:0; border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <p style="font-size:0.78rem; color:var(--text-muted); letter-spacing:0.06em;">
+      <a href="{% url 'home' %}" style="color:var(--gold);">Home</a> &nbsp;/&nbsp;
+      <a href="{% url 'hotels' %}" style="color:var(--gold);">Hotels</a> &nbsp;/&nbsp;
+      {{ hotel.name }}
+    </p>
+  </div>
+</div>
+
+<!-- DETAIL CONTENT -->
+<section class="section">
+  <div class="container">
+    <div class="detail-layout">
+
+      <!-- LEFT: INFO + REVIEWS -->
+      <div class="detail-content">
+        <div class="detail-section-title">About This Property</div>
+        <div class="divider-gold"></div>
+        <p class="description-text">{{ hotel.description }}</p>
+
+        <div class="divider"></div>
+
+        <!-- REVIEWS -->
+        <div class="detail-section-title">Guest Reviews</div>
+        <div class="divider-gold"></div>
+
+        {% if reviews %}
+          {% for review in reviews %}
+          <div class="review-item">
+            <div class="review-meta">
+              <span class="review-author">{{ review.user.username }}</span>
+              <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="stars" style="margin-bottom:0.5rem;">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}&#9733;{% else %}&#9734;{% endif %}
+              {% endfor %}
+            </div>
+            <p class="review-text">{{ review.comment }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0;">
+            No reviews yet. Be the first to share your experience!
+          </p>
+        {% endif %}
+
+        <!-- ADD REVIEW -->
+        {% if user.is_authenticated %}
+        <div class="review-form">
+          <div class="detail-section-title" style="font-size:1.2rem; margin-bottom:1rem;">Write a Review</div>
+          <form method="POST" action="{% url 'add_review' hotel.slug %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="form-label">Your Rating</label>
+              <div class="star-select">
+                {% for i in "54321" %}
+                  <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" />
+                  <label for="star{{ i }}">&#9733;</label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Review</label>
+              <textarea name="comment" class="form-textarea" placeholder="Share your experience..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-gold">
+              <i class="fas fa-paper-plane"></i> Submit Review
+            </button>
+          </form>
+        </div>
+        {% else %}
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.4rem; margin-top:1rem; text-align:center;">
+            <p style="color:var(--text-muted); margin-bottom:1rem;">
+              <a href="{% url 'login' %}" style="color:var(--gold);">Sign in</a> to leave a review.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT: BOOKING CARD -->
+      <aside>
+        <div class="booking-card">
+          <div class="booking-card__title">Reserve Your Stay</div>
+          <div class="booking-card__price">
+            ₹{{ hotel.price_per_night }}
+            <span>/ night</span>
+          </div>
+
+          {% if user.is_authenticated %}
+          <form method="POST" action="{% url 'book_hotel' hotel.slug %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="form-label">Check In</label>
+              <input type="date" name="check_in" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Check Out</label>
+              <input type="date" name="check_out" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Guests</label>
+              <input type="number" name="guests" min="1" max="20" placeholder="1" class="form-input" required />
+            </div>
+            <div class="divider-gold"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; font-size:0.8rem; color:var(--text-muted);">
+              <span>Payment Method</span>
+              <span class="badge badge-gold">Pay at Hotel</span>
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.9rem;">
+              <i class="fas fa-calendar-plus"></i> Confirm Booking
+            </button>
+          </form>
+          {% else %}
+            <div style="text-align:center; padding:1rem 0;">
+              <p style="color:var(--text-muted); margin-bottom:1.2rem; font-size:0.88rem;">
+                You need an account to book this property.
+              </p>
+              <a href="{% url 'login' %}" class="btn btn-gold" style="width:100%; justify-content:center; margin-bottom:0.6rem; display:flex;">Sign In to Book</a>
+              <a href="{% url 'register' %}" class="btn btn-outline" style="width:100%; justify-content:center; display:flex;">Create Account</a>
+            </div>
+          {% endif %}
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

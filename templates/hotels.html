@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}All Hotels — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hotels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+  }
+  .hotel-card { position: relative; }
+  .hotel-card__badge {
+    position: absolute;
+    top: 1rem; left: 1rem;
+    z-index: 2;
+  }
+  @media (max-width: 1024px) { .hotels-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 640px)  { .hotels-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-hero">
+  <div class="page-hero__content">
+    <div class="section-label" style="margin-bottom:0.6rem;">Our Properties</div>
+    <h1 class="page-hero__title">All Hotels</h1>
+    <p class="page-hero__breadcrumb">
+      <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp; Hotels
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="hotels-grid">
+      {% for hotel in hotels %}
+      <div class="card hotel-card">
+        <div class="card__img-wrap">
+          {% if hotel.image %}
+            <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="card__img" />
+          {% else %}
+            <div style="height:220px; background: linear-gradient(135deg, var(--surface), rgba(201,169,110,0.08)); display:flex; align-items:center; justify-content:center;">
+              <i class="fas fa-hotel" style="font-size:2.5rem; color:var(--gold); opacity:0.25;"></i>
+            </div>
+          {% endif %}
+          {% if hotel.featured %}
+          <div class="hotel-card__badge">
+            <span class="badge badge-gold"><i class="fas fa-star"></i> Featured</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card__body">
+          <div class="card__label">{{ hotel.destination.name }}</div>
+          <div class="card__title">{{ hotel.name }}</div>
+          <p class="card__text">{{ hotel.description|truncatechars:90 }}</p>
+          <div class="card__price">₹{{ hotel.price_per_night }} <span>/ night</span></div>
+        </div>
+        <div class="card__footer">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <a href="{% url 'hotel_detail' hotel.slug %}" class="btn btn-gold" style="padding:0.45rem 1.1rem; font-size:0.72rem;">
+            View <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+        <p style="color:var(--text-muted); grid-column:1/-1; padding:4rem 0; text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.4rem;">
+          No hotels available at the moment.
+        </p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings — Voyageur{% endblock %}
+
+{% block extra_head %}
+<style>
+  .booking-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    gap: 0;
+    overflow: hidden;
+    transition: var(--transition);
+    margin-bottom: 1.2rem;
+  }
+  .booking-row:hover {
+    border-color: rgba(201,169,110,0.35);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+  .booking-row__img {
+    width: 140px; height: 100%;
+    object-fit: cover;
+    min-height: 140px;
+  }
+  .booking-row__placeholder {
+    width: 140px;
+    background: linear-gradient(135deg, var(--surface), rgba(201,169,110,0.08));
+    display: flex; align-items: center; justify-content: center;
+    min-height: 140px;
+  }
+  .booking-row__body { padding: 1.4rem 1.6rem; }
+  .booking-row__actions { padding: 1.4rem; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem; border-left: 1px solid var(--border); }
+
+  .booking-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .booking-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .booking-meta-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .booking-meta-val {
+    font-size: 0.88rem;
+    color: var(--text-main);
+  }
+  .empty-bookings {
+    text-align: center;
+    padding: 6rem 2rem;
+  }
+  .empty-bookings i {
+    font-size: 3.5rem;
+    color: var(--gold);
+    opacity: 0.2;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .booking-row { grid-template-columns: 1fr; }
+    .booking-row__img { width: 100%; height: 180px; }
+    .booking-row__placeholder { width: 100%; height: 140px; }
+    .booking-row__actions { border-left: none; border-top: 1px solid var(--border); flex-direction: row; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-hero">
+  <div class="page-hero__content">
+    <div class="section-label" style="margin-bottom:0.6rem;">Your Account</div>
+    <h1 class="page-hero__title">My Bookings</h1>
+    <p class="page-hero__breadcrumb">
+      <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp; My Bookings
+    </p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    {% if bookings %}
+      {% for booking in bookings %}
+      <div class="booking-row">
+        {% if booking.hotel.image %}
+          <img src="{{ booking.hotel.image.url }}" alt="{{ booking.hotel.name }}" class="booking-row__img" />
+        {% else %}
+          <div class="booking-row__placeholder">
+            <i class="fas fa-hotel" style="font-size:1.8rem; color:var(--gold); opacity:0.3;"></i>
+          </div>
+        {% endif %}
+
+        <div class="booking-row__body">
+          <div class="card__label">{{ booking.hotel.destination.name }}</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--text-main); margin-bottom:0.2rem;">
+            {{ booking.hotel.name }}
+          </div>
+          <div class="booking-meta">
+            <div class="booking-meta-item">
+              <span class="booking-meta-label">Check In</span>
+              <span class="booking-meta-val">{{ booking.check_in }}</span>
+            </div>
+            <div class="booking-meta-item">
+              <span class="booking-meta-label">Check Out</span>
+              <span class="booking-meta-val">{{ booking.check_out }}</span>
+            </div>
+            <div class="booking-meta-item">
+              <span class="booking-meta-label">Guests</span>
+              <span class="booking-meta-val">{{ booking.guests }}</span>
+            </div>
+            <div class="booking-meta-item">
+              <span class="booking-meta-label">Payment</span>
+              <span class="booking-meta-val">{{ booking.payment_method }}</span>
+            </div>
+            <div class="booking-meta-item">
+              <span class="booking-meta-label">Booked On</span>
+              <span class="booking-meta-val">{{ booking.created_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-row__actions">
+          <a href="{% url 'hotel_detail' booking.hotel.slug %}" class="btn btn-outline" style="font-size:0.72rem; padding:0.5rem 1rem;">
+            View Hotel
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-bookings">
+        <i class="fas fa-calendar-xmark"></i>
+        <h2 style="font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--text-main); margin-bottom:0.8rem;">No Bookings Yet</h2>
+        <p style="color:var(--text-muted); margin-bottom:2rem;">You haven't made any reservations yet. Start exploring!</p>
+        <a href="{% url 'hotels' %}" class="btn btn-gold">
+          <i class="fas fa-compass"></i> Browse Hotels
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
